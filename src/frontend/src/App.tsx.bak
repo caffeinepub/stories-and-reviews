@@ -201,7 +201,6 @@ export default function App() {
   );
   const [authorBio, setAuthorBio] = useState<string>(() => load("sar_bio", ""));
   const [page, setPage] = useState<string>("home");
-  const [browseMode, setBrowseMode] = useState(false);
   const [adminPasswordVerified, setAdminPasswordVerified] = useState(false);
   const [adminPasswordInput, setAdminPasswordInput] = useState("");
   const [adminPasswordError, setAdminPasswordError] = useState(false);
@@ -359,7 +358,7 @@ export default function App() {
   }
 
   // Site closed
-  if (!siteOpen && !isAdmin && !browseMode) {
+  if (!siteOpen && !isAdmin) {
     return (
       <div className="min-h-screen bg-[#0a0a0a] flex flex-col items-center justify-center text-white">
         <Logo size={80} />
@@ -373,35 +372,18 @@ export default function App() {
         >
           Stories and Reviews
         </h1>
-        <p className="text-gray-400 mt-2 mb-6">
-          Welcome! Browse stories or log in as admin.
+        <p className="text-gray-400 mt-2">
+          This site is currently closed. Check back soon!
         </p>
-        <div className="flex flex-col gap-3 w-52">
-          <button
-            type="button"
-            onClick={() => setBrowseMode(true)}
-            className="px-4 py-2 rounded bg-[#39ff14] text-black font-semibold text-sm hover:opacity-80"
-          >
-            Browse Stories
-          </button>
-          <button
-            type="button"
-            onClick={() => {
-              setBrowseMode(true);
-              login();
-            }}
-            className="px-4 py-2 rounded bg-white text-black font-semibold text-sm hover:opacity-80"
-          >
-            Login to Comment
-          </button>
+        {!principal && (
           <button
             type="button"
             onClick={login}
-            className="px-4 py-2 rounded bg-[#00fff7] text-black font-semibold text-sm hover:opacity-80"
+            className="mt-6 px-4 py-2 rounded bg-[#00fff7] text-black font-semibold text-sm hover:opacity-80"
           >
             Admin Login
           </button>
-        </div>
+        )}
       </div>
     );
   }
@@ -962,7 +944,7 @@ function StoryPage({
         </a>
       </div>
 
-      <div className="prose max-w-none bg-white text-black leading-relaxed whitespace-pre-wrap mb-6 rounded-xl p-6 shadow">
+      <div className="prose prose-invert max-w-none text-gray-200 leading-relaxed whitespace-pre-wrap mb-6">
         {story.body}
       </div>
 
