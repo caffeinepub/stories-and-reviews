@@ -1,22 +1,25 @@
 # Stories and Reviews
 
 ## Current State
-Admin panel has Comments tab with Remove and Ban User buttons per comment. Users identified by author name and principal.
+Story objects have a `published: boolean` field. New stories default to `published: false`. The admin panel shows all stories. The main site filters to only `published: true` stories. There is a small checkbox labeled "Published" in the story edit form, but it is easy to miss, causing confusion.
 
 ## Requested Changes (Diff)
 
 ### Add
-- Clicking a user name in admin panel opens a popup with: Comment, Feature Comment, Message Privately, Ban, Unban
+- Dedicated "Publish" button (green) and "Save as Draft" button in the story edit form
+- Clear Draft/Published status badge on each story card in the admin panel
+- One-click "Publish" / "Unpublish" toggle button directly on each story card in the admin panel (without opening the edit form)
+- Draft mode is now an explicit, named feature
 
 ### Modify
-- Comments and Messages sections: user name becomes clickable, triggers the popup
-- Remove standalone Ban User button (replaced by popup)
+- Remove the plain checkbox for "Published" in the edit form; replace with two clear action buttons: "Publish" and "Save as Draft"
+- Make the Draft/Published badge more prominent on admin story cards
+- Admin panel story list should show a quick toggle button per story
 
 ### Remove
-- Standalone Ban User button in comments tab
+- The small, easy-to-miss "Published" checkbox in the edit form
 
 ## Implementation Plan
-1. Add UserActionPopup component with 5 action buttons
-2. Track open popup state by entry id
-3. Wire actions: comment reply, feature toggle, private message compose, ban, unban
-4. Highlight featured comments with a badge
+1. In the story edit form, replace the Published checkbox with two buttons at the bottom: "Save as Draft" (saves with published:false) and "Publish" (saves with published:true)
+2. On each story card in the admin panel list, add a prominent status badge (Draft in gray, Published in teal) and a quick toggle button ("Publish" if draft, "Unpublish" if published)
+3. Add a `togglePublished(id)` helper function that flips the published state of a story without opening the edit form

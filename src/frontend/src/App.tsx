@@ -1405,12 +1405,16 @@ function AdminPage({
     return () => document.removeEventListener("click", handler);
   }, []);
 
-  function saveStory() {
+  function saveStory(publish?: boolean) {
     if (!editStory?.title) return;
+    const publishedValue =
+      publish !== undefined ? publish : (editStory.published ?? false);
     if (editStory.id) {
       setStories((prev) =>
         prev.map((s) =>
-          s.id === editStory.id ? ({ ...s, ...editStory } as Story) : s,
+          s.id === editStory.id
+            ? ({ ...s, ...editStory, published: publishedValue } as Story)
+            : s,
         ),
       );
     } else {
@@ -1426,13 +1430,19 @@ function AdminPage({
         seriesOrder: editStory.seriesOrder,
         readCount: 0,
         createdAt: Date.now(),
-        published: editStory.published ?? false,
+        published: publishedValue,
         googleDriveUrl: editStory.googleDriveUrl,
         subtext: editStory.subtext,
       };
       setStories((prev) => [...prev, newStory]);
     }
     setEditStory(null);
+  }
+
+  function togglePublished(id: string) {
+    setStories((prev) =>
+      prev.map((s) => (s.id === id ? { ...s, published: !s.published } : s)),
+    );
   }
 
   function saveSeries() {
@@ -1724,29 +1734,26 @@ function AdminPage({
                     </div>
                   ))}
                 </div>
-                <label className="flex items-center gap-2 text-sm text-gray-400 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={editStory.published ?? false}
-                    onChange={(e) =>
-                      setEditStory((p) => ({
-                        ...p,
-                        published: e.target.checked,
-                      }))
-                    }
-                  />
-                  Published
-                </label>
-                <div className="flex gap-2">
+                <div className="flex gap-2 flex-wrap">
                   <button
                     type="button"
-                    onClick={saveStory}
-                    className="px-4 py-2 bg-[#00fff7] text-black rounded font-semibold text-sm hover:opacity-80"
+                    data-ocid="story.save_draft_button"
+                    onClick={() => saveStory(false)}
+                    className="px-4 py-2 bg-[#1a1a1a] border border-yellow-600 text-yellow-400 rounded font-semibold text-sm hover:bg-yellow-900/20"
                   >
-                    Save
+                    Save as Draft
                   </button>
                   <button
                     type="button"
+                    data-ocid="story.publish_button"
+                    onClick={() => saveStory(true)}
+                    className="px-4 py-2 bg-[#00fff7] text-black rounded font-semibold text-sm hover:opacity-80"
+                  >
+                    Publish
+                  </button>
+                  <button
+                    type="button"
+                    data-ocid="story.cancel_button"
                     onClick={() => setEditStory(null)}
                     className="px-4 py-2 bg-[#1a1a1a] border border-[#333] text-gray-300 rounded text-sm hover:bg-[#222]"
                   >
@@ -1767,14 +1774,23 @@ function AdminPage({
                     {s.title}
                   </span>
                   <span
-                    className={`ml-2 text-xs px-2 py-0.5 rounded-full ${s.published ? "bg-[#00fff7]/10 text-[#00fff7]" : "bg-[#333] text-gray-400"}`}
+                    className={`ml-2 text-xs px-2 py-0.5 rounded-full font-semibold ${s.published ? "bg-[#00fff7]/20 text-[#00fff7] border border-[#00fff7]/40" : "bg-yellow-900/30 text-yellow-400 border border-yellow-600/40"}`}
                   >
-                    {s.published ? "Published" : "Draft"}
+                    {s.published ? "✓ Published" : "✎ Draft"}
                   </span>
                 </div>
                 <div className="flex gap-2">
                   <button
                     type="button"
+                    data-ocid="story.toggle_publish_button"
+                    onClick={() => togglePublished(s.id)}
+                    className={`text-xs px-2 py-1 rounded border ${s.published ? "text-gray-400 border-[#333] hover:text-white hover:border-gray-400" : "text-[#00fff7] border-[#00fff7]/40 hover:bg-[#00fff7]/10"}`}
+                  >
+                    {s.published ? "Unpublish" : "Publish"}
+                  </button>
+                  <button
+                    type="button"
+                    data-ocid="story.edit_button"
                     onClick={() => setEditStory(s)}
                     className="text-xs text-gray-400 hover:text-white border border-[#333] px-2 py-1 rounded"
                   >
